@@ -1,7 +1,7 @@
 package ericdiaz.program.newsapp.network
 
 import ericdiaz.program.newsapp.model.NewsResponse
-import io.reactivex.Single
+import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -45,5 +45,5 @@ interface NewsService {
     fun getNews(
         @Query("country") country: String = "us",
         @Query("apiKey") apiKey: String = "bf55d1d5740747198c59af77466416d1"
-    ): Single<NewsResponse>
+    ): Observable<NewsResponse>
 }
