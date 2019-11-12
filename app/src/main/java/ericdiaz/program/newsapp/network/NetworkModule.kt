@@ -1,7 +1,7 @@
 package ericdiaz.program.newsapp.network
 
 import ericdiaz.program.newsapp.model.NewsResponse
-import io.reactivex.Single
+import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -14,30 +14,27 @@ import retrofit2.http.Query
 private const val BASE_URL = "https://newsapi.org"
 private const val PATH = "v2/top-headlines"
 
-class NetworkModule {
+object NetworkModule : BaseNetwork {
 
-    companion object {
+    private val loggingInterceptor: HttpLoggingInterceptor =
+        HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BASIC
+        }
 
-        private val loggingInterceptor: HttpLoggingInterceptor =
-            HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BASIC
-            }
-
-        private val loggingOkHttpClient: OkHttpClient =
-            OkHttpClient()
-                .newBuilder()
-                .addInterceptor(loggingInterceptor)
-                .build()
-
-        private val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(loggingOkHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+    private val loggingOkHttpClient: OkHttpClient =
+        OkHttpClient()
+            .newBuilder()
+            .addInterceptor(loggingInterceptor)
             .build()
 
-        fun getNewsService(): NewsService = retrofit.create(NewsService::class.java)
-    }
+    private val retrofit: Retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .client(loggingOkHttpClient)
+        .addConverterFactory(MoshiConverterFactory.create())
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+        .build()
+
+    override fun getNewsService(): NewsService = retrofit.create(NewsService::class.java)
 }
 
 interface NewsService {
@@ -45,5 +42,5 @@ interface NewsService {
     fun getNews(
         @Query("country") country: String = "us",
         @Query("apiKey") apiKey: String = "bf55d1d5740747198c59af77466416d1"
-    ): Single<NewsResponse>
+    ): Observable<NewsResponse>
 }
