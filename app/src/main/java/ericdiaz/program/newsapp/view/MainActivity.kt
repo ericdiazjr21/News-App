@@ -1,6 +1,7 @@
 package ericdiaz.program.newsapp.view
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.jakewharton.rxbinding2.view.RxView
@@ -22,9 +23,11 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         presenter
             .intent(
                 RxView.clicks(data_request_button)
-                    .debounce(1000, TimeUnit.MILLISECONDS)
+                    .debounce(3000, TimeUnit.MILLISECONDS)
                     //mocking some input
-                    .map { UiModel(Box("us")) })
+                    .doOnNext { Log.d("Sasuke", it.toString()) }
+                    .map { UiModel(Box("us")) }
+            )
 
     }
 
